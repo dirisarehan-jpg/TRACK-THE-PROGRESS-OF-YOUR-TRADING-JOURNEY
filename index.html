@@ -327,8 +327,12 @@
                         <option>Loss</option>
                         <option>Breakeven</option>
                     </select>
-                    <label>Upload Screenshot</label>
-                    <input type="file" id="screenshot" accept="image/*">
+                    <label>Upload Screenshot Before</label>
+<input type="file" id="beforeShot" accept="image/*">
+
+<label>Upload Screenshot After</label>
+<input type="file" id="afterShot" accept="image/*">
+                    
                     <textarea id="notes" placeholder="Trade Notes"></textarea>
                     <button onclick="addTrade()">Save Trade</button>
                 </div>
@@ -348,6 +352,10 @@
                                 <th>Lot</th>
                                 <th>Outcome</th>
                                 <th>Screenshot</th>
+                                <th>Before</th>
+<th>After</th>
+<th>Delete</th>
+
                             </tr>
                         </thead>
                         <tbody id="tradeTable"></tbody>
@@ -356,6 +364,19 @@
             </div>
         </div>
     </div>
+    <div class="card">
+
+<h2>Weekly Review</h2>
+
+<label>Select Week</label>
+<input type="week" id="weekPicker">
+
+<button onclick="generateWeeklyReview()">Generate Review</button>
+
+<div id="weeklyResults"></div>
+
+</div>
+
 
     <script>
         let currentUser = null;
@@ -553,15 +574,27 @@
                 if (t.outcome === "Win") wins++;
                 if (t.outcome === "Loss") losses++;
 
-                let row = `<tr>
-                    <td>${t.date || '-'}</td>
-                    <td>${t.pair || '-'}</td>
-                    <td>${t.type || '-'}</td>
-                    <td>${t.session || '-'}</td>
-                    <td>${t.lotsize || '-'}</td>
-                    <td>${t.outcome || '-'}</td>
-                    <td>${t.screenshot ? `<img src="${t.screenshot}">` : '-'}</td>
-                </tr>`;
+               let row=`<tr>
+<td>${trade.date}</td>
+<td>${trade.pair}</td>
+<td>${trade.type}</td>
+<td>${trade.lotsize}</td>
+<td>${trade.entry}</td>
+<td>${trade.result}</td>
+
+<td>
+${trade.before ? `<button onclick="viewImage('${trade.before}')">View</button>` : "None"}
+</td>
+
+<td>
+${trade.after ? `<button onclick="viewImage('${trade.after}')">View</button>` : "None"}
+</td>
+
+<td>
+<button onclick="deleteTrade(${index})">Delete</button>
+</td>
+
+</tr>`
 
                 table.innerHTML += row;
             });
@@ -612,7 +645,93 @@ function resetPassword(){
 }
 
         }
+        function viewImage(src){
+
+let win = window.open("")
+
+win.document.write(`
+<style>
+body{
+margin:0;
+background:black;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+img{
+max-width:90%;
+max-height:90%;
+}
+</style>
+
+<img src="${src}">
+`)
+
+}
+function generateWeeklyReview(){
+
+let selectedWeek = document.getElementById("weekPicker").value
+
+if(!selectedWeek){
+alert("Select a week first")
+return
+}
+
+let results = document.getElementById("weeklyResults")
+
+results.innerHTML=""
+
+let wins=0
+let losses=0
+let total=0
+
+trades.forEach(trade=>{
+
+let tradeWeek = trade.date.slice(0,7)
+
+if(selectedWeek.startsWith(tradeWeek)){
+
+total++
+
+if(trade.result=="Win") wins++
+if(trade.result=="Loss") losses++
+
+results.innerHTML += `
+<div style="background:#020617;padding:10px;margin:10px;border-radius:6px">
+
+<p><b>Date:</b> ${trade.date}</p>
+<p><b>Pair:</b> ${trade.pair}</p>
+<p><b>Result:</b> ${trade.result}</p>
+
+${trade.before ? `<button onclick="viewImage('${trade.before}')">Before Screenshot</button>` : ""}
+
+${trade.after ? `<button onclick="viewImage('${trade.after}')">After Screenshot</button>` : ""}
+
+</div>
+`
+}
+
+})
+
+let winrate = total ? ((wins/total)*100).toFixed(1) : 0
+
+results.innerHTML = `
+<h3>Weekly Stats</h3>
+
+<p>Total Trades: ${total}</p>
+<p>Wins: ${wins}</p>
+<p>Losses: ${losses}</p>
+<p>Win Rate: ${winrate}%</p>
+
+<hr>
+
+` + results.innerHTML
+
+}
+
     </script>
 </body>
 
 </html>
+
