@@ -327,6 +327,15 @@
                         <option>Loss</option>
                         <option>Breakeven</option>
                     </select>
+                    <label>Entry Price</label>
+<input type="number" id="entry">
+
+<label>Stop Loss</label>
+<input type="number" id="sl">
+
+<label>Take Profit</label>
+<input type="number" id="tp">
+
                     <label>Upload Screenshot Before</label>
 <input type="file" id="beforeShot" accept="image/*">
 
@@ -352,8 +361,8 @@
                                 <th>Lot</th>
                                 <th>Outcome</th>
                         
-                                <th>Before</th>
-<th>After</th>
+                                <th>screenshotBefore</th>
+<th>screenshotAfter</th>
 <th>Delete</th>
 
                             </tr>
@@ -734,5 +743,6 @@ results.innerHTML = `
 </body>
 
 </html>
+
 
 
